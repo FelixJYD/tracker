@@ -23,6 +23,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return $request->user();
     });
 
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
+
+    
     Route::get('/expenses', [ExpenseController::class, 'index']);
     Route::post('/expenses', [ExpenseController::class, 'store']);
     Route::get('/expenses/{expense}', [ExpenseController::class, 'show']);
