@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -37,7 +38,19 @@ class AuthenticatedSessionController extends Controller
 
         //$user=Auth::user();
 
-        return $user->createToken("Celular")->plainTextToken;
+        $existingToken = DB::table('personal_access_tokens')
+        ->where('tokenable_type', get_class($user))
+        ->where('tokenable_id', $user->id)
+        ->first();
+
+      // Existe token
+        if ($existingToken) {
+            return response()->json(['token' => $existingToken->token]);
+        }
+
+      // No existe tokne
+        $token = $user->createToken('Celular')->plainTextToken;
+        return response()->json(['token' => $token]);
 
        // return response()->noContent();
 
@@ -51,4 +64,4 @@ class AuthenticatedSessionController extends Controller
         $request->user()->currentAccessToken()->delete();
 		return json_encode([]);
     }
-}   
+}
