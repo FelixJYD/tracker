@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -20,7 +22,18 @@ class AuthenticatedSessionController extends Controller
 
        // $request->session()->regenerate();
 
+       $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required']
+    ]);
+
        $user=User::where('email',$request->email)->first();
+
+       if (!$user || !Hash::check($request->password, $user->password)) {
+        throw ValidationException::withMessages([
+            'email' => ['The provided credentials are incorrect.'],
+        ]);
+    }
 
         //$user=Auth::user();
 
@@ -33,14 +46,9 @@ class AuthenticatedSessionController extends Controller
     /**
      * Destroy an authenticated session.
      */
-    public function destroy(Request $request): Response
+    public function destroy(Request $request): string
     {
-        Auth::guard('web')->logout();
-
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
-
-        return response()->noContent();
+        $request->user()->currentAccessToken()->delete();
+		return json_encode([]);
     }
-}
+}   
