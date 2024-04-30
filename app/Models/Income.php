@@ -13,10 +13,19 @@ class Income extends Model
         'description',
         'amount',
         'date',
+        'user_id',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($income) {
+            // Cuando se crea un nuevo ingreso, actualiza el saldo total del usuario asociado
+            $income->user->updateTotalBalance();
+        });
     }
 }

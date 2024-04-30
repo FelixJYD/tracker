@@ -11,11 +11,16 @@ use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\UserController;
 
 Route::get('/users', [UserController::class, 'index']);
+
+
 // Rutas de autenticación (no requieren autenticación)
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/register', [RegisteredUserController::class, 'store']);
 Route::post('/forgot-password', [PasswordResetLinkController::class, 'store']);
 Route::post('/reset-password', [NewPasswordController::class, 'store']);
+
+
+
 
 // Rutas protegidas por autenticación
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -25,7 +30,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
 
-    
+
     Route::get('/expenses', [ExpenseController::class, 'index']);
     Route::post('/expenses', [ExpenseController::class, 'store']);
     Route::get('/expenses/{expense}', [ExpenseController::class, 'show']);

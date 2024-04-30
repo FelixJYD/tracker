@@ -25,7 +25,8 @@ class AuthenticatedSessionController extends Controller
 
        $request->validate([
         'email' => ['required', 'email'],
-        'password' => ['required']
+        'password' => ['required'],
+        'device_name' => ['required'],
     ]);
 
        $user=User::where('email',$request->email)->first();
@@ -41,6 +42,7 @@ class AuthenticatedSessionController extends Controller
         $existingToken = DB::table('personal_access_tokens')
         ->where('tokenable_type', get_class($user))
         ->where('tokenable_id', $user->id)
+        ->where('name', $request->device_name)
         ->first();
 
       // Existe token
